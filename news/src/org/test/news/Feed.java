@@ -1,7 +1,6 @@
 package org.test.news;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
@@ -41,12 +40,12 @@ public class Feed {
                 socket.setKeepAlive(true);
                 connectSuccessful = true;
                 System.out.printf("Connected to server %s:%d %n", host, port);
-                System.out.printf("Sending %d messages every %d seconds", numberOfItems, frequencyMillis / 1000);
+                System.out.printf("Sending %d messages every %d seconds%n", numberOfItems, frequencyMillis / 1000);
                 while (!Thread.currentThread().isInterrupted()) {
                     long start = System.currentTimeMillis();
                     while (System.currentTimeMillis() - start < frequencyMillis) {
                         //spin wait...                      
-                        Thread.sleep(100);
+                        Thread.sleep(1000);
                     }
                     System.out.printf("sending %d messages to server %n", numberOfItems);
                     messageGenerator.generateMessages(numberOfItems, message -> {
@@ -79,11 +78,6 @@ public class Feed {
         String hostName = "localhost";
         InetAddress host;
         int argsCount = args.length;
-        System.out.printf("Usage: Feed [number_of_items:%d] [frequency_seconds:%d] [host:%s] [port:%s] %n", numberOfItems,
-                          frequency, hostName, port);
-        if (argsCount < 2) {
-            System.out.printf("...attempting to connect to %s:%s %n", hostName, port);
-        }
         try {
             numberOfItems = argsCount >= 1 ? Integer.valueOf(args[0]) : numberOfItems;
             frequency = argsCount >= 2 ? Integer.valueOf(args[1]) : frequency;
@@ -95,6 +89,9 @@ public class Feed {
             }
             port = argsCount > 3 ? args[3] : port;
             int portNr = Integer.valueOf(port);
+            System.out.printf("Usage: Feed [number_of_items:%d] [frequency_seconds:%d] [host:%s] [port:%s] %n", numberOfItems,
+                              frequency, hostName, port);
+            System.out.printf("...attempting to connect to %s:%s %n", hostName, port);
             Feed feed = new Feed(numberOfItems, frequency, host, portNr);
             feed.start();
         } catch (NumberFormatException e) {
